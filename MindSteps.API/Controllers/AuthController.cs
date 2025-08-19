@@ -21,4 +21,11 @@ public class AuthController : ControllerBase
         var token = await _service.AutenticarAsync(login);
         return token == null ? Unauthorized("Credenciais inválidas") : Ok(new { token });
     }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Sair([FromBody] LoginDto login)
+    {
+        var token = await _service.AutenticarAsync(login);
+        return token == null ? Unauthorized("Credenciais inválidas") : Ok(new { token });
+    }
 }
