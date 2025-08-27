@@ -73,7 +73,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var origins = Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(o => o.AddPolicy("Default", p => p.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod()));
 var app = builder.Build();
 app.UseCors("Default");

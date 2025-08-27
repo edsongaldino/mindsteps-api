@@ -7,7 +7,7 @@ namespace MindSteps.Domain.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Required(ErrorMessage = "O nome � obrigat�rio")]
+        [Required(ErrorMessage = "O nome é obrigat�rio")]
         [MaxLength(100)]
         public string Nome { get; set; }
 
