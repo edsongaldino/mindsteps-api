@@ -18,7 +18,8 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get() => Ok(await _service.ObterTodosAsync());
+	[AllowAnonymous]
+	public async Task<IActionResult> Get() => Ok(await _service.ObterTodosAsync());
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
