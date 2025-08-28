@@ -6,6 +6,7 @@ using MindSteps.Application.Interfaces;
 namespace MindSteps.API.Controllers;
 
 [ApiController]
+[AllowAnonymous]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
@@ -17,7 +18,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-	[AllowAnonymous]
 	public async Task<IActionResult> Login([FromBody] LoginDto login)
     {
         var token = await _service.AutenticarAsync(login);
