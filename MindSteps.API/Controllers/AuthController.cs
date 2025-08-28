@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MindSteps.API.Controllers;
 
@@ -16,7 +17,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto login)
+	[AllowAnonymous]
+	public async Task<IActionResult> Login([FromBody] LoginDto login)
     {
         var token = await _service.AutenticarAsync(login);
         return token == null ? Unauthorized("Credenciais inválidas") : Ok(new { token });
