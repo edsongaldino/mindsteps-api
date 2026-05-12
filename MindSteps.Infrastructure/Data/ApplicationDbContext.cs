@@ -1,31 +1,26 @@
-using MindSteps.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using MindSteps.Domain.Entities;
 
 namespace MindSteps.Infrastructure.Data;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+		: base(options)
+	{
+	}
 
-    public DbSet<Usuario> Usuarios { get; set; }
+	public DbSet<Usuario> Usuarios => Set<Usuario>();
+	public DbSet<Psicologo> Psicologos => Set<Psicologo>();
+	public DbSet<Paciente> Pacientes => Set<Paciente>();
+	public DbSet<Atividade> Atividades => Set<Atividade>();
+	public DbSet<AtividadePaciente> AtividadesPacientes => Set<AtividadePaciente>();
+	public DbSet<CheckInEmocional> CheckInsEmocionais => Set<CheckInEmocional>();
+	public DbSet<RegistroPensamento> RegistrosPensamentos => Set<RegistroPensamento>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 		base.OnModelCreating(modelBuilder);
-
-		modelBuilder.Entity<Usuario>(b =>
-		{
-			b.ToTable("usuarios"); // nome da tabela em snake_case
-
-			b.Property(x => x.Id).HasColumnName("id");
-			b.Property(x => x.Nome).HasColumnName("nome");
-			b.Property(x => x.Email).HasColumnName("email");
-			b.Property(x => x.Telefone).HasColumnName("telefone");
-			b.Property(x => x.Senha).HasColumnName("senha");
-
-			// índice único para email
-			b.HasIndex(x => x.Email).IsUnique();
-		});
 	}
-
 }

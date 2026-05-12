@@ -1,26 +1,26 @@
-using System.ComponentModel.DataAnnotations;
+using MindSteps.Domain.Enums;
 
-namespace MindSteps.Domain.Entities
+namespace MindSteps.Domain.Entities;
+
+public class Usuario
 {
-    public class Usuario
-    {
-        [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+	public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Required(ErrorMessage = "O nome é obrigat�rio")]
-        [MaxLength(100)]
-        public string Nome { get; set; }
+	public string Nome { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O e-mail � obrigat�rio")]
-        [MaxLength(150)]
-        [EmailAddress(ErrorMessage = "E-mail inv�lido")]
-        public string Email { get; set; }
+	public string Email { get; set; } = string.Empty;
 
-        [MaxLength(20)]
-        public string? Telefone { get; set; }
+	public string SenhaHash { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A senha � obrigat�ria")]
-        [MaxLength(255)]
-        public string Senha { get; set; }
-    }
+	public PerfilUsuario Perfil { get; set; }
+
+	public bool Ativo { get; set; } = true;
+
+	public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+
+	public DateTime? AtualizadoEm { get; set; }
+
+	public Psicologo? Psicologo { get; set; }
+
+	public Paciente? Paciente { get; set; }
 }

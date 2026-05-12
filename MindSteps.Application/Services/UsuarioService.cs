@@ -2,63 +2,91 @@ using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
-using MindSteps.SharedKernel.Security;
 
 namespace MindSteps.Application.Services;
 
 public class UsuarioService : IUsuarioService
 {
-    private readonly IUsuarioRepository _repo;
-    private readonly ITokenService _tokenService;
+	private readonly IUsuarioRepository _usuarioRepository;
 
-    public UsuarioService(IUsuarioRepository repo, ITokenService tokenService)
-    {
-        _repo = repo;
-        _tokenService = tokenService;
-    }
+	public UsuarioService(IUsuarioRepository usuarioRepository)
+	{
+		_usuarioRepository = usuarioRepository;
+	}
 
-    public async Task<IEnumerable<UsuarioDto>> ObterTodosAsync() =>
-        (await _repo.ObterTodosAsync()).Select(u => new UsuarioDto {
-            Id = u.Id, Nome = u.Nome, Email = u.Email, Telefone = u.Telefone
-        });
+	public async Task<IEnumerable<UsuarioResponseDto>> ObterTodosAsync()
+	{
+		var usuarios = await _usuarioRepository.ObterTodosAsync();
 
-    public async Task<UsuarioDto> ObterPorIdAsync(Guid id)
-    {
-        var u = await _repo.ObterPorIdAsync(id);
-        return u == null ? null : new UsuarioDto { Id = u.Id, Nome = u.Nome, Email = u.Email, Telefone = u.Telefone };
-    }
+		return usuarios.Select(x => new UsuarioResponseDto
+		{
+			Id = x.Id,
+			Nome = x.Nome,
+			Email = x.Email,
+			Perfil = x.Perfil,
+			Ativo = x.Ativo
+		});
+	}
 
-    public async Task<UsuarioDto> CriarAsync(UsuarioDto dto)
-    {
-        var u = new Usuario {
-            Id = Guid.NewGuid(),
-            Nome = dto.Nome,
-            Email = dto.Email,
-            Telefone = dto.Telefone,
-            Senha = "123456" // Idealmente usar hash e vir da API
-        };
-        await _repo.CriarAsync(u);
-        dto.Id = u.Id;
-        return dto;
-    }
+	public async Task<UsuarioResponseDto?> ObterPorIdAsync(Guid id)
+	{
+		var usuario = await _usuarioRepository.ObterPorIdAsync(id);
 
-    public async Task<UsuarioDto> AtualizarAsync(Guid id, UsuarioDto dto)
-    {
-        var u = await _repo.ObterPorIdAsync(id);
-        if (u == null) return null;
+		if (usuario is null)
+			return null;
 
-        u.Nome = dto.Nome;
-        u.Email = dto.Email;
-        u.Telefone = dto.Telefone;
-        await _repo.AtualizarAsync(u);
-        return dto;
-    }
+		return new UsuarioResponseDto
+		{
+			Id = usuario.Id,
+			Nome = usuario.Nome,
+			Email = usuario.Email,
+			Perfil = usuario.Perfil,
+			Ativo = usuario.Ativo
+		};
+	}
 
-    public async Task<bool> RemoverAsync(Guid id) => await _repo.RemoverAsync(id);
+	public async Task<UsuarioResponseDto> CriarAsync(UsuarioCreateDto dto)
+	{
+		var emailExiste = await _usuarioRepository.ExisteEmailAsync(dto.Email);
 
-    public async Task<string> AutenticarAsync(LoginDto login)
-    {
-        var usuario = await _repo.ObterPorEmailSenhaAsync(login.Email, login.Senha);
-        return usuario != null ? _tokenService.GerarToken(usuario) : null;
-    }
+		if (emailExiste)
+			throw new Exception("Já existe um usuário com este e-mail.");
+
+		var usuario = new Usuario
+		{
+			Nome = dto.Nome,
+			Email = dto.Email.ToLower().Trim(),
+			SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
+			Perfil = dto.Perfil,
+			Ativo = true,
+			CriadoEm = DateTime.UtcNow
+		};
+
+		await _usuarioRepository.AdicionarAsync(usuario);
+		await _usuarioRepository.SalvarAlteracoesAsync();
+
+		return new UsuarioResponseDto
+		{
+			Id = usuario.Id,
+			Nome = usuario.Nome,
+			Email = usuario.Email,
+			Perfil = usuario.Perfil,
+			Ativo = usuario.Ativo
+		};
+	}
+
+	public async Task<bool> DesativarAsync(Guid id)
+	{
+		var usuario = await _usuarioRepository.ObterPorIdAsync(id);
+
+		if (usuario is null)
+			return false;
+
+		usuario.Ativo = false;
+		usuario.AtualizadoEm = DateTime.UtcNow;
+
+		await _usuarioRepository.SalvarAlteracoesAsync();
+
+		return true;
+	}
 }

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MindSteps.API.Controllers;
 
@@ -10,24 +12,40 @@ namespace MindSteps.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IUsuarioService _service;
+	private readonly IAuthService _service;
 
-    public AuthController(IUsuarioService service)
-    {
-        _service = service;
-    }
+	public AuthController(IAuthService service)
+	{
+		_service = service;
+	}
 
-    [HttpPost("login")]
+	[HttpPost("login")]
 	public async Task<IActionResult> Login([FromBody] LoginDto login)
-    {
-        var token = await _service.AutenticarAsync(login);
-        return token == null ? Unauthorized("Credenciais inválidas") : Ok(new { token });
-    }
+	{
+		var response = await _service.AutenticarAsync(login);
 
-    [HttpPost("logout")]
-    public async Task<IActionResult> Sair([FromBody] LoginDto login)
-    {
-        var token = await _service.AutenticarAsync(login);
-        return token == null ? Unauthorized("Credenciais inválidas") : Ok(new { token });
-    }
+		if (response is null)
+			return Unauthorized("Credenciais inválidas");
+
+		return Ok(response);
+	}
+
+	[Authorize]
+	[HttpGet("me")]
+	public async Task<IActionResult> Me()
+	{
+		var usuarioIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+		if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+			return Unauthorized();
+
+		var usuarioId = Guid.Parse(usuarioIdClaim);
+
+		var response = await _service.ObterUsuarioLogadoAsync(usuarioId);
+
+		if (response is null)
+			return NotFound();
+
+		return Ok(response);
+	}
 }
