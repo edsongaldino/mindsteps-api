@@ -1,13 +1,14 @@
-using MindSteps.Application.Interfaces;
-using MindSteps.Application.Services;
-using MindSteps.Domain.Interfaces;
-using MindSteps.Infrastructure.Data;
-using MindSteps.Infrastructure.Repositories;
-using MindSteps.SharedKernel.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MindSteps.Application.Interfaces;
+using MindSteps.Application.Services;
+using MindSteps.Domain.Interfaces;
+using MindSteps.Infrastructure.Data;
+using MindSteps.Infrastructure.Data.Seed;
+using MindSteps.Infrastructure.Repositories;
+using MindSteps.SharedKernel.Security;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -139,5 +140,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+	var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+	await context.Database.MigrateAsync();
+
+	await DbSeeder.SeedAsync(context);
+}
 
 app.Run();

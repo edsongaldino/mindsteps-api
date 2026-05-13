@@ -3,12 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-
-namespace MindSteps.API.Controllers;
 
 [ApiController]
-[AllowAnonymous]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
@@ -19,6 +15,7 @@ public class AuthController : ControllerBase
 		_service = service;
 	}
 
+	[AllowAnonymous]
 	[HttpPost("login")]
 	public async Task<IActionResult> Login([FromBody] LoginDto login)
 	{
