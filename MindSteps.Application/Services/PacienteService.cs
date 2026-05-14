@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Enums;
@@ -124,6 +124,36 @@ public class PacienteService : IPacienteService
 			Genero = paciente.Genero,
 			FotoUrl = paciente.FotoUrl,
 			Ativo = usuario.Ativo
+		};
+	}
+
+	public async Task<PacienteResponseDto?> AtualizarAsync(Guid id, PacienteUpdateDto dto)
+	{
+		var paciente = await _pacienteRepository.ObterPorIdAsync(id);
+
+		if (paciente is null)
+			return null;
+
+		paciente.Usuario.Nome = dto.Nome;
+		paciente.Usuario.Email = dto.Email.ToLower().Trim();
+		paciente.DataNascimento = dto.DataNascimento;
+		paciente.Genero = dto.Genero;
+		paciente.AtualizadoEm = DateTime.UtcNow;
+		paciente.Usuario.AtualizadoEm = DateTime.UtcNow;
+
+		await _pacienteRepository.SalvarAlteracoesAsync();
+
+		return new PacienteResponseDto
+		{
+			Id = paciente.Id,
+			UsuarioId = paciente.UsuarioId,
+			PsicologoId = paciente.PsicologoId,
+			Nome = paciente.Usuario.Nome,
+			Email = paciente.Usuario.Email,
+			DataNascimento = paciente.DataNascimento,
+			Genero = paciente.Genero,
+			FotoUrl = paciente.FotoUrl,
+			Ativo = paciente.Usuario.Ativo
 		};
 	}
 

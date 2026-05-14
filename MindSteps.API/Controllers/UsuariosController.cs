@@ -47,6 +47,24 @@ public class UsuariosController : ControllerBase
 		}
 	}
 
+	[HttpPut("{id:guid}")]
+	public async Task<IActionResult> Atualizar(Guid id, [FromBody] UsuarioUpdateDto dto)
+	{
+		try
+		{
+			var usuario = await _usuarioService.AtualizarAsync(id, dto);
+
+			if (usuario is null)
+				return NotFound();
+
+			return Ok(usuario);
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> Desativar(Guid id)
 	{

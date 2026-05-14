@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
@@ -31,6 +31,13 @@ public class CheckInsEmocionaisController : ControllerBase
 			return NotFound();
 
 		return Ok(checkIn);
+	}
+
+	[HttpGet("status-hoje/{pacienteId:guid}")]
+	public async Task<IActionResult> VerificarStatusHoje(Guid pacienteId)
+	{
+		var jaFez = await _checkInService.VerificarCheckInHojeAsync(pacienteId);
+		return Ok(new { jaFez });
 	}
 
 	[HttpPost]

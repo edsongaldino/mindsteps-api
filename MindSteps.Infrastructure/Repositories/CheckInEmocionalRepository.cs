@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
 using MindSteps.Infrastructure.Data;
@@ -27,6 +27,15 @@ public class CheckInEmocionalRepository : ICheckInEmocionalRepository
 	{
 		return await _context.CheckInsEmocionais
 			.FirstOrDefaultAsync(x => x.Id == id);
+	}
+
+	public async Task<bool> JaFezCheckInHojeAsync(Guid pacienteId)
+	{
+		var inicioDia = DateTime.UtcNow.Date;
+		var fimDia = inicioDia.AddDays(1).AddTicks(-1);
+
+		return await _context.CheckInsEmocionais
+			.AnyAsync(x => x.PacienteId == pacienteId && x.CriadoEm >= inicioDia && x.CriadoEm <= fimDia);
 	}
 
 	public async Task AdicionarAsync(CheckInEmocional checkIn)

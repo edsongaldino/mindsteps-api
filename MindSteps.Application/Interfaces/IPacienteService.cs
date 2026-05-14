@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 
 namespace MindSteps.Application.Interfaces;
 
@@ -8,5 +8,6 @@ public interface IPacienteService
 	Task<IEnumerable<PacienteResponseDto>> ObterPorPsicologoAsync(Guid psicologoId);
 	Task<PacienteResponseDto?> ObterPorIdAsync(Guid id);
 	Task<PacienteResponseDto> CriarAsync(PacienteCreateDto dto);
+	Task<PacienteResponseDto?> AtualizarAsync(Guid id, PacienteUpdateDto dto);
 	Task<bool> DesativarAsync(Guid id);
 }

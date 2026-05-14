@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Enums;
@@ -137,6 +137,36 @@ public class PsicologoService : IPsicologoService
 		await _psicologoRepository.SalvarAlteracoesAsync();
 
 		return true;
+	}
+
+	public async Task<PsicologoResponseDto?> AtualizarAsync(Guid id, PsicologoUpdateDto dto)
+	{
+		var psicologo = await _psicologoRepository.ObterPorIdAsync(id);
+
+		if (psicologo is null)
+			return null;
+
+		psicologo.Usuario.Nome = dto.Nome;
+		psicologo.Usuario.Email = dto.Email.ToLower().Trim();
+		psicologo.Crp = dto.Crp;
+		psicologo.Bio = dto.Bio;
+		psicologo.AtualizadoEm = DateTime.UtcNow;
+		psicologo.Usuario.AtualizadoEm = DateTime.UtcNow;
+
+		await _psicologoRepository.SalvarAlteracoesAsync();
+
+		return new PsicologoResponseDto
+		{
+			Id = psicologo.Id,
+			UsuarioId = psicologo.UsuarioId,
+			Nome = psicologo.Usuario.Nome,
+			Email = psicologo.Usuario.Email,
+			Crp = psicologo.Crp,
+			Bio = psicologo.Bio,
+			FotoUrl = psicologo.FotoUrl,
+			Aprovado = psicologo.Aprovado,
+			Ativo = psicologo.Usuario.Ativo
+		};
 	}
 
 	public async Task<bool> ReprovarAsync(Guid id)

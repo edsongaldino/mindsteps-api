@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
@@ -47,6 +47,25 @@ public class PsicologosController : ControllerBase
 		{
 			var psicologo = await _psicologoService.CriarAsync(dto);
 			return CreatedAtAction(nameof(ObterPorId), new { id = psicologo.Id }, psicologo);
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
+	[HttpPut("{id:guid}")]
+	[Authorize(Roles = "Administrador")]
+	public async Task<IActionResult> Atualizar(Guid id, [FromBody] PsicologoUpdateDto dto)
+	{
+		try
+		{
+			var psicologo = await _psicologoService.AtualizarAsync(id, dto);
+
+			if (psicologo is null)
+				return NotFound();
+
+			return Ok(psicologo);
 		}
 		catch (Exception ex)
 		{

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,4 +27,12 @@ public class PacienteResponseDto
 	public string? Genero { get; set; }
 	public string? FotoUrl { get; set; }
 	public bool Ativo { get; set; }
+}
+
+public class PacienteUpdateDto
+{
+	public string Nome { get; set; } = string.Empty;
+	public string Email { get; set; } = string.Empty;
+	public DateTime? DataNascimento { get; set; }
+	public string? Genero { get; set; }
 }

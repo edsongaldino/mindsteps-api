@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,4 +27,12 @@ public class PsicologoResponseDto
 	public string? FotoUrl { get; set; }
 	public bool Aprovado { get; set; }
 	public bool Ativo { get; set; }
+}
+
+public class PsicologoUpdateDto
+{
+	public string Nome { get; set; } = string.Empty;
+	public string Email { get; set; } = string.Empty;
+	public string Crp { get; set; } = string.Empty;
+	public string? Bio { get; set; }
 }

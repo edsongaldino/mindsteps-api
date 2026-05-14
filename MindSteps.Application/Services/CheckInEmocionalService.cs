@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
@@ -35,12 +35,20 @@ public class CheckInEmocionalService : ICheckInEmocionalService
 		return MapToResponse(checkIn);
 	}
 
+	public async Task<bool> VerificarCheckInHojeAsync(Guid pacienteId)
+	{
+		return await _checkInRepository.JaFezCheckInHojeAsync(pacienteId);
+	}
+
 	public async Task<CheckInEmocionalResponseDto> CriarAsync(CheckInEmocionalCreateDto dto)
 	{
 		var paciente = await _pacienteRepository.ObterPorIdAsync(dto.PacienteId);
 
 		if (paciente is null || !paciente.Usuario.Ativo)
 			throw new Exception("Paciente não encontrado ou inativo.");
+
+		if (await _checkInRepository.JaFezCheckInHojeAsync(dto.PacienteId))
+			throw new Exception("Você já realizou seu check-in emocional hoje.");
 
 		if (dto.Intensidade < 0 || dto.Intensidade > 10)
 			throw new Exception("A intensidade deve estar entre 0 e 10.");

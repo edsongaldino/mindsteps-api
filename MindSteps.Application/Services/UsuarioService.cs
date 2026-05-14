@@ -50,7 +50,7 @@ public class UsuarioService : IUsuarioService
 		var emailExiste = await _usuarioRepository.ExisteEmailAsync(dto.Email);
 
 		if (emailExiste)
-			throw new Exception("J· existe um usu·rio com este e-mail.");
+			throw new Exception("J√° existe um usu√°rio com este e-mail.");
 
 		var usuario = new Usuario
 		{
@@ -63,6 +63,30 @@ public class UsuarioService : IUsuarioService
 		};
 
 		await _usuarioRepository.AdicionarAsync(usuario);
+		await _usuarioRepository.SalvarAlteracoesAsync();
+
+		return new UsuarioResponseDto
+		{
+			Id = usuario.Id,
+			Nome = usuario.Nome,
+			Email = usuario.Email,
+			Perfil = usuario.Perfil,
+			Ativo = usuario.Ativo
+		};
+	}
+
+	public async Task<UsuarioResponseDto?> AtualizarAsync(Guid id, UsuarioUpdateDto dto)
+	{
+		var usuario = await _usuarioRepository.ObterPorIdAsync(id);
+
+		if (usuario is null)
+			return null;
+
+		usuario.Nome = dto.Nome;
+		usuario.Email = dto.Email.ToLower().Trim();
+		usuario.Perfil = dto.Perfil;
+		usuario.AtualizadoEm = DateTime.UtcNow;
+
 		await _usuarioRepository.SalvarAlteracoesAsync();
 
 		return new UsuarioResponseDto
