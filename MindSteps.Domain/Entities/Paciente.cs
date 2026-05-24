@@ -1,4 +1,4 @@
-﻿namespace MindSteps.Domain.Entities;
+namespace MindSteps.Domain.Entities;
 
 public class Paciente
 {
@@ -18,6 +18,10 @@ public class Paciente
 
 	public string? FotoUrl { get; set; }
 
+	public int Pontos { get; set; } = 0;
+
+	public int Nivel { get; set; } = 1;
+
 	public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 
 	public DateTime? AtualizadoEm { get; set; }
@@ -27,4 +31,6 @@ public class Paciente
 	public ICollection<CheckInEmocional> CheckInsEmocionais { get; set; } = new List<CheckInEmocional>();
 
 	public ICollection<RegistroPensamento> RegistrosPensamentos { get; set; } = new List<RegistroPensamento>();
+
+	public string? Anotacoes { get; set; }
 }

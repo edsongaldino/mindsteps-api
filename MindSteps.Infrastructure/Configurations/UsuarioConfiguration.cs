@@ -20,6 +20,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 			.IsRequired()
 			.HasMaxLength(180);
 
+		builder.Property(x => x.Telefone)
+			.HasMaxLength(20);
+
 		builder.HasIndex(x => x.Email)
 			.IsUnique();
 

@@ -13,6 +13,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(webRootPath))
+{
+	Directory.CreateDirectory(webRootPath);
+}
+builder.Environment.WebRootPath = webRootPath;
+
 var configuration = builder.Configuration;
 var jwtSettings = configuration.GetSection("JwtSettings");
 var secret = jwtSettings["Secret"];
@@ -34,6 +41,7 @@ builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
 builder.Services.AddScoped<ICheckInEmocionalRepository, CheckInEmocionalRepository>();
 builder.Services.AddScoped<IRegistroPensamentoRepository, RegistroPensamentoRepository>();
+builder.Services.AddScoped<IMensagemRepository, MensagemRepository>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -43,6 +51,7 @@ builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAtividadeService, AtividadeService>();
 builder.Services.AddScoped<ICheckInEmocionalService, CheckInEmocionalService>();
 builder.Services.AddScoped<IRegistroPensamentoService, RegistroPensamentoService>();
+builder.Services.AddScoped<IMensagemService, MensagemService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services
@@ -127,6 +136,8 @@ var app = builder.Build();
 
 app.UseCors("Default");
 
+app.UseStaticFiles();
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -148,6 +159,31 @@ using (var scope = app.Services.CreateScope())
 	await context.Database.MigrateAsync();
 
 	await DbSeeder.SeedAsync(context);
+
+	// Recalcular pontos e níveis de todos os pacientes para manter o banco de dados consistente
+	var pacientes = await context.Pacientes.ToListAsync();
+	foreach (var p in pacientes)
+	{
+		var atividadesConcluidas = await context.AtividadesPacientes
+			.Include(ap => ap.Atividade)
+			.Where(ap => ap.PacienteId == p.Id && ap.Status == MindSteps.Domain.Enums.StatusAtividadePaciente.Concluida)
+			.ToListAsync();
+
+		var pontosAtividades = atividadesConcluidas
+			.Sum(ap => (ap.Atividade != null && ap.Atividade.Nivel > 0 ? ap.Atividade.Nivel : 1) * 10);
+
+		var totalCheckins = await context.CheckInsEmocionais
+			.CountAsync(c => c.PacienteId == p.Id);
+		var pontosCheckins = totalCheckins * 10;
+
+		var totalRegistrosAvulsos = await context.RegistrosPensamentos
+			.CountAsync(r => r.PacienteId == p.Id && r.AtividadePacienteId == null);
+		var pontosRegistros = totalRegistrosAvulsos * 15;
+
+		p.Pontos = pontosAtividades + pontosCheckins + pontosRegistros;
+		p.Nivel = (p.Pontos / 100) + 1;
+	}
+	await context.SaveChangesAsync();
 }
 
 app.Run();

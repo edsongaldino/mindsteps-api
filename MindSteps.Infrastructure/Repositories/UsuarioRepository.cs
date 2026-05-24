@@ -18,6 +18,8 @@ public class UsuarioRepository : IUsuarioRepository
 	{
 		return await _context.Usuarios
 			.AsNoTracking()
+			.Include(x => x.Paciente)
+			.Include(x => x.Psicologo)
 			.ToListAsync();
 	}
 
@@ -45,6 +47,8 @@ public class UsuarioRepository : IUsuarioRepository
 		var emailNormalizado = email.ToLower().Trim();
 
 		return await _context.Usuarios
+			.Include(x => x.Paciente)
+			.Include(x => x.Psicologo)
 			.FirstOrDefaultAsync(x => x.Email == emailNormalizado);
 	}
 

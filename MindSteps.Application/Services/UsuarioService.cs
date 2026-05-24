@@ -24,7 +24,8 @@ public class UsuarioService : IUsuarioService
 			Nome = x.Nome,
 			Email = x.Email,
 			Perfil = x.Perfil,
-			Ativo = x.Ativo
+			Ativo = x.Ativo,
+			FotoUrl = x.Paciente?.FotoUrl ?? x.Psicologo?.FotoUrl
 		});
 	}
 
@@ -112,5 +113,28 @@ public class UsuarioService : IUsuarioService
 		await _usuarioRepository.SalvarAlteracoesAsync();
 
 		return true;
+	}
+
+	public async Task<string?> AtualizarFotoAsync(Guid id, string fotoUrl)
+	{
+		var usuario = await _usuarioRepository.ObterComPerfisPorIdAsync(id);
+
+		if (usuario is null)
+			return null;
+
+		if (usuario.Paciente is not null)
+		{
+			usuario.Paciente.FotoUrl = fotoUrl;
+			usuario.Paciente.AtualizadoEm = DateTime.UtcNow;
+		}
+		else if (usuario.Psicologo is not null)
+		{
+			usuario.Psicologo.FotoUrl = fotoUrl;
+			usuario.Psicologo.AtualizadoEm = DateTime.UtcNow;
+		}
+
+		await _usuarioRepository.SalvarAlteracoesAsync();
+
+		return fotoUrl;
 	}
 }

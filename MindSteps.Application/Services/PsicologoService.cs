@@ -29,6 +29,7 @@ public class PsicologoService : IPsicologoService
 			UsuarioId = x.UsuarioId,
 			Nome = x.Usuario.Nome,
 			Email = x.Usuario.Email,
+			Telefone = x.Usuario.Telefone,
 			Crp = x.Crp,
 			Bio = x.Bio,
 			FotoUrl = x.FotoUrl,
@@ -47,6 +48,7 @@ public class PsicologoService : IPsicologoService
 			UsuarioId = x.UsuarioId,
 			Nome = x.Usuario.Nome,
 			Email = x.Usuario.Email,
+			Telefone = x.Usuario.Telefone,
 			Crp = x.Crp,
 			Bio = x.Bio,
 			FotoUrl = x.FotoUrl,
@@ -68,6 +70,7 @@ public class PsicologoService : IPsicologoService
 			UsuarioId = psicologo.UsuarioId,
 			Nome = psicologo.Usuario.Nome,
 			Email = psicologo.Usuario.Email,
+			Telefone = psicologo.Usuario.Telefone,
 			Crp = psicologo.Crp,
 			Bio = psicologo.Bio,
 			FotoUrl = psicologo.FotoUrl,
@@ -92,6 +95,7 @@ public class PsicologoService : IPsicologoService
 		{
 			Nome = dto.Nome,
 			Email = dto.Email.ToLower().Trim(),
+			Telefone = dto.Telefone,
 			SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
 			Perfil = PerfilUsuario.Psicologo,
 			Ativo = true,
@@ -116,6 +120,7 @@ public class PsicologoService : IPsicologoService
 			UsuarioId = usuario.Id,
 			Nome = usuario.Nome,
 			Email = usuario.Email,
+			Telefone = usuario.Telefone,
 			Crp = psicologo.Crp,
 			Bio = psicologo.Bio,
 			FotoUrl = psicologo.FotoUrl,
@@ -148,6 +153,7 @@ public class PsicologoService : IPsicologoService
 
 		psicologo.Usuario.Nome = dto.Nome;
 		psicologo.Usuario.Email = dto.Email.ToLower().Trim();
+		psicologo.Usuario.Telefone = dto.Telefone;
 		psicologo.Crp = dto.Crp;
 		psicologo.Bio = dto.Bio;
 		psicologo.AtualizadoEm = DateTime.UtcNow;
@@ -161,6 +167,7 @@ public class PsicologoService : IPsicologoService
 			UsuarioId = psicologo.UsuarioId,
 			Nome = psicologo.Usuario.Nome,
 			Email = psicologo.Usuario.Email,
+			Telefone = psicologo.Usuario.Telefone,
 			Crp = psicologo.Crp,
 			Bio = psicologo.Bio,
 			FotoUrl = psicologo.FotoUrl,

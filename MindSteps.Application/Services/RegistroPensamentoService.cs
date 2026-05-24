@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
@@ -75,6 +75,18 @@ public class RegistroPensamentoService : IRegistroPensamentoService
 		};
 
 		await _registroRepository.AdicionarAsync(registro);
+
+		// Gamificação: conceder 15 XP caso seja um registro de pensamentos avulso (independente de atividade)
+		if (!dto.AtividadePacienteId.HasValue)
+		{
+			paciente.Pontos += 15;
+			var novoNivel = (paciente.Pontos / 100) + 1;
+			if (novoNivel > paciente.Nivel)
+			{
+				paciente.Nivel = novoNivel;
+			}
+		}
+
 		await _registroRepository.SalvarAlteracoesAsync();
 
 		return MapToResponse(registro);

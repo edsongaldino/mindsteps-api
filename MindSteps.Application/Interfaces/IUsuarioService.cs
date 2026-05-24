@@ -9,4 +9,5 @@ public interface IUsuarioService
 	Task<UsuarioResponseDto> CriarAsync(UsuarioCreateDto dto);
 	Task<UsuarioResponseDto?> AtualizarAsync(Guid id, UsuarioUpdateDto dto);
 	Task<bool> DesativarAsync(Guid id);
+	Task<string?> AtualizarFotoAsync(Guid id, string fotoUrl);
 }

@@ -1,4 +1,4 @@
-﻿using BCrypt.Net;
+using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Enums;
@@ -67,6 +67,8 @@ public static class DbSeeder
 			DataNascimento = new DateTime(2012, 5, 10, 0, 0, 0, DateTimeKind.Utc),
 			Genero = "Feminino",
 			FotoUrl = null,
+			Pontos = 55,
+			Nivel = 1,
 			CriadoEm = agora
 		};
 

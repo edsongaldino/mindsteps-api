@@ -36,7 +36,10 @@ public class PacienteService : IPacienteService
 			DataNascimento = x.DataNascimento,
 			Genero = x.Genero,
 			FotoUrl = x.FotoUrl,
-			Ativo = x.Usuario.Ativo
+			Pontos = x.Pontos,
+			Nivel = x.Nivel,
+			Ativo = x.Usuario.Ativo,
+			Anotacoes = x.Anotacoes
 		});
 	}
 
@@ -54,7 +57,10 @@ public class PacienteService : IPacienteService
 			DataNascimento = x.DataNascimento,
 			Genero = x.Genero,
 			FotoUrl = x.FotoUrl,
-			Ativo = x.Usuario.Ativo
+			Pontos = x.Pontos,
+			Nivel = x.Nivel,
+			Ativo = x.Usuario.Ativo,
+			Anotacoes = x.Anotacoes
 		});
 	}
 
@@ -72,10 +78,14 @@ public class PacienteService : IPacienteService
 			PsicologoId = paciente.PsicologoId,
 			Nome = paciente.Usuario.Nome,
 			Email = paciente.Usuario.Email,
+			Telefone = paciente.Usuario.Telefone,
 			DataNascimento = paciente.DataNascimento,
 			Genero = paciente.Genero,
 			FotoUrl = paciente.FotoUrl,
-			Ativo = paciente.Usuario.Ativo
+			Pontos = paciente.Pontos,
+			Nivel = paciente.Nivel,
+			Ativo = paciente.Usuario.Ativo,
+			Anotacoes = paciente.Anotacoes
 		};
 	}
 
@@ -95,6 +105,7 @@ public class PacienteService : IPacienteService
 		{
 			Nome = dto.Nome,
 			Email = dto.Email.ToLower().Trim(),
+			Telefone = dto.Telefone,
 			SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
 			Perfil = PerfilUsuario.Paciente,
 			Ativo = true,
@@ -120,10 +131,14 @@ public class PacienteService : IPacienteService
 			PsicologoId = paciente.PsicologoId,
 			Nome = usuario.Nome,
 			Email = usuario.Email,
+			Telefone = usuario.Telefone,
 			DataNascimento = paciente.DataNascimento,
 			Genero = paciente.Genero,
 			FotoUrl = paciente.FotoUrl,
-			Ativo = usuario.Ativo
+			Pontos = paciente.Pontos,
+			Nivel = paciente.Nivel,
+			Ativo = usuario.Ativo,
+			Anotacoes = paciente.Anotacoes
 		};
 	}
 
@@ -136,6 +151,7 @@ public class PacienteService : IPacienteService
 
 		paciente.Usuario.Nome = dto.Nome;
 		paciente.Usuario.Email = dto.Email.ToLower().Trim();
+		paciente.Usuario.Telefone = dto.Telefone;
 		paciente.DataNascimento = dto.DataNascimento;
 		paciente.Genero = dto.Genero;
 		paciente.AtualizadoEm = DateTime.UtcNow;
@@ -150,10 +166,14 @@ public class PacienteService : IPacienteService
 			PsicologoId = paciente.PsicologoId,
 			Nome = paciente.Usuario.Nome,
 			Email = paciente.Usuario.Email,
+			Telefone = paciente.Usuario.Telefone,
 			DataNascimento = paciente.DataNascimento,
 			Genero = paciente.Genero,
 			FotoUrl = paciente.FotoUrl,
-			Ativo = paciente.Usuario.Ativo
+			Pontos = paciente.Pontos,
+			Nivel = paciente.Nivel,
+			Ativo = paciente.Usuario.Ativo,
+			Anotacoes = paciente.Anotacoes
 		};
 	}
 
@@ -167,6 +187,21 @@ public class PacienteService : IPacienteService
 		paciente.Usuario.Ativo = false;
 		paciente.AtualizadoEm = DateTime.UtcNow;
 		paciente.Usuario.AtualizadoEm = DateTime.UtcNow;
+
+		await _pacienteRepository.SalvarAlteracoesAsync();
+
+		return true;
+	}
+
+	public async Task<bool> AtualizarAnotacoesAsync(Guid id, string? anotacoes)
+	{
+		var paciente = await _pacienteRepository.ObterPorIdAsync(id);
+
+		if (paciente is null)
+			return false;
+
+		paciente.Anotacoes = anotacoes;
+		paciente.AtualizadoEm = DateTime.UtcNow;
 
 		await _pacienteRepository.SalvarAlteracoesAsync();
 

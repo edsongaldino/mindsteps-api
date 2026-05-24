@@ -1,4 +1,4 @@
-﻿using MindSteps.Domain.Enums;
+using MindSteps.Domain.Enums;
 
 namespace MindSteps.Domain.Entities;
 
@@ -21,6 +21,22 @@ public class Atividade
 	public string? AudioUrl { get; set; }
 
 	public string? ArquivoUrl { get; set; }
+
+	// Novos campos da Wizard
+	public string? TipoResposta { get; set; }
+	public bool AtividadeObrigatoria { get; set; } = true;
+	public bool PermitirAnexos { get; set; }
+	public string? FeedbackAutomatico { get; set; }
+	public string? CategoriaEmocional { get; set; }
+	public string? NivelSugerido { get; set; }
+	public int Nivel { get; set; } = 1;
+	public string? Frequencia { get; set; }
+	public string? DiasSemana { get; set; }
+	public string? HorarioSugerido { get; set; }
+	public string? PrazoConclusao { get; set; }
+	public bool NotificarPush { get; set; } = true;
+	public bool NotificarEmail { get; set; } = true;
+	public bool LembreteSuave { get; set; }
 
 	public bool Ativo { get; set; } = true;
 

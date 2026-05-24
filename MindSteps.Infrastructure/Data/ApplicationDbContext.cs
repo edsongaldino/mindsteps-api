@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
 	public DbSet<AtividadePaciente> AtividadesPacientes => Set<AtividadePaciente>();
 	public DbSet<CheckInEmocional> CheckInsEmocionais => Set<CheckInEmocional>();
 	public DbSet<RegistroPensamento> RegistrosPensamentos => Set<RegistroPensamento>();
+	public DbSet<Mensagem> Mensagens => Set<Mensagem>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
@@ -42,7 +42,8 @@ public class AuthService : IAuthService
 			UsuarioId = usuario.Id,
 			Nome = usuario.Nome,
 			Email = usuario.Email,
-			Perfil = usuario.Perfil.ToString()
+			Perfil = usuario.Perfil.ToString(),
+			FotoUrl = usuario.Paciente?.FotoUrl ?? usuario.Psicologo?.FotoUrl
 		};
 	}
 
@@ -89,7 +90,11 @@ public class AuthService : IAuthService
 			PacienteId = usuario.Paciente?.Id,
 			Nome = usuario.Nome,
 			Email = usuario.Email,
-			Perfil = usuario.Perfil.ToString()
+			Telefone = usuario.Telefone,
+			Perfil = usuario.Perfil.ToString(),
+			Pontos = usuario.Paciente?.Pontos,
+			Nivel = usuario.Paciente?.Nivel,
+			FotoUrl = usuario.Paciente?.FotoUrl ?? usuario.Psicologo?.FotoUrl
 		};
 	}
 }

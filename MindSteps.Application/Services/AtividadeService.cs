@@ -1,4 +1,4 @@
-﻿using MindSteps.Application.DTOs;
+using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Enums;
@@ -63,7 +63,21 @@ public class AtividadeService : IAtividadeService
 			AudioUrl = dto.AudioUrl,
 			ArquivoUrl = dto.ArquivoUrl,
 			Ativo = true,
-			CriadoEm = DateTime.UtcNow
+			CriadoEm = DateTime.UtcNow,
+			TipoResposta = dto.TipoResposta,
+			AtividadeObrigatoria = dto.AtividadeObrigatoria,
+			PermitirAnexos = dto.PermitirAnexos,
+			FeedbackAutomatico = dto.FeedbackAutomatico,
+			CategoriaEmocional = dto.CategoriaEmocional,
+			NivelSugerido = dto.NivelSugerido,
+			Nivel = dto.Nivel > 0 ? dto.Nivel : 1,
+			Frequencia = dto.Frequencia,
+			DiasSemana = dto.DiasSemana,
+			HorarioSugerido = dto.HorarioSugerido,
+			PrazoConclusao = dto.PrazoConclusao,
+			NotificarPush = dto.NotificarPush,
+			NotificarEmail = dto.NotificarEmail,
+			LembreteSuave = dto.LembreteSuave
 		};
 
 		await _atividadeRepository.AdicionarAsync(atividade);
@@ -87,13 +101,16 @@ public class AtividadeService : IAtividadeService
 		if (paciente.PsicologoId != atividade.PsicologoId)
 			throw new Exception("Este paciente não pertence ao psicólogo responsável pela atividade.");
 
+		if (paciente.Nivel < atividade.Nivel)
+			throw new Exception($"O paciente está no nível {paciente.Nivel} e esta atividade exige o nível {atividade.Nivel}. Estimule a participação do paciente para liberar!");
+
 		var atividadePaciente = new AtividadePaciente
 		{
 			AtividadeId = dto.AtividadeId,
 			PacienteId = dto.PacienteId,
 			Status = StatusAtividadePaciente.Pendente,
 			DataEnvio = DateTime.UtcNow,
-			DataLimite = dto.DataLimite
+			DataLimite = dto.DataLimite.HasValue ? DateTime.SpecifyKind(dto.DataLimite.Value, DateTimeKind.Utc) : null
 		};
 
 		await _atividadeRepository.AdicionarAtividadePacienteAsync(atividadePaciente);
@@ -124,7 +141,21 @@ public class AtividadeService : IAtividadeService
 			AudioUrl = atividade.AudioUrl,
 			ArquivoUrl = atividade.ArquivoUrl,
 			Ativo = atividade.Ativo,
-			CriadoEm = atividade.CriadoEm
+			CriadoEm = atividade.CriadoEm,
+			TipoResposta = atividade.TipoResposta,
+			AtividadeObrigatoria = atividade.AtividadeObrigatoria,
+			PermitirAnexos = atividade.PermitirAnexos,
+			FeedbackAutomatico = atividade.FeedbackAutomatico,
+			CategoriaEmocional = atividade.CategoriaEmocional,
+			NivelSugerido = atividade.NivelSugerido,
+			Nivel = atividade.Nivel,
+			Frequencia = atividade.Frequencia,
+			DiasSemana = atividade.DiasSemana,
+			HorarioSugerido = atividade.HorarioSugerido,
+			PrazoConclusao = atividade.PrazoConclusao,
+			NotificarPush = atividade.NotificarPush,
+			NotificarEmail = atividade.NotificarEmail,
+			LembreteSuave = atividade.LembreteSuave
 		};
 	}
 
@@ -136,12 +167,16 @@ public class AtividadeService : IAtividadeService
 			AtividadeId = item.AtividadeId,
 			PacienteId = item.PacienteId,
 			Titulo = item.Atividade.Titulo,
+			Descricao = item.Atividade.Descricao,
+			Conteudo = item.Atividade.Conteudo,
 			Tipo = item.Atividade.Tipo,
 			Status = item.Status,
+			Nivel = item.Atividade.Nivel,
 			DataEnvio = item.DataEnvio,
 			DataLimite = item.DataLimite,
 			DataConclusao = item.DataConclusao,
-			RespostaTexto = item.RespostaTexto
+			RespostaTexto = item.RespostaTexto,
+			NotaHumor = item.NotaHumor
 		};
 	}
 
@@ -160,6 +195,18 @@ public class AtividadeService : IAtividadeService
 		atividadePaciente.NotaHumor = dto.NotaHumor;
 		atividadePaciente.Status = StatusAtividadePaciente.Concluida;
 		atividadePaciente.DataConclusao = DateTime.UtcNow;
+
+		var pontosGanhos = (atividadePaciente.Atividade.Nivel > 0 ? atividadePaciente.Atividade.Nivel : 1) * 10;
+		var paciente = await _pacienteRepository.ObterPorIdAsync(atividadePaciente.PacienteId);
+		if (paciente is not null)
+		{
+			paciente.Pontos += pontosGanhos;
+			var novoNivel = (paciente.Pontos / 100) + 1;
+			if (novoNivel > paciente.Nivel)
+			{
+				paciente.Nivel = novoNivel;
+			}
+		}
 
 		await _atividadeRepository.SalvarAlteracoesAsync();
 

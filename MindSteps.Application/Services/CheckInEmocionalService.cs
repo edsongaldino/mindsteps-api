@@ -47,8 +47,7 @@ public class CheckInEmocionalService : ICheckInEmocionalService
 		if (paciente is null || !paciente.Usuario.Ativo)
 			throw new Exception("Paciente não encontrado ou inativo.");
 
-		if (await _checkInRepository.JaFezCheckInHojeAsync(dto.PacienteId))
-			throw new Exception("Você já realizou seu check-in emocional hoje.");
+		var jaFezCheckinHoje = await _checkInRepository.JaFezCheckInHojeAsync(dto.PacienteId);
 
 		if (dto.Intensidade < 0 || dto.Intensidade > 10)
 			throw new Exception("A intensidade deve estar entre 0 e 10.");
@@ -64,6 +63,18 @@ public class CheckInEmocionalService : ICheckInEmocionalService
 		};
 
 		await _checkInRepository.AdicionarAsync(checkIn);
+
+		// Gamificação: check-in emocional concede 10 XP (apenas 1 vez por dia)
+		if (!jaFezCheckinHoje)
+		{
+			paciente.Pontos += 10;
+			var novoNivel = (paciente.Pontos / 100) + 1;
+			if (novoNivel > paciente.Nivel)
+			{
+				paciente.Nivel = novoNivel;
+			}
+		}
+
 		await _checkInRepository.SalvarAlteracoesAsync();
 
 		return MapToResponse(checkIn);

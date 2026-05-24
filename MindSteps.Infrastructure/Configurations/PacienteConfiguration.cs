@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MindSteps.Domain.Entities;
 
@@ -17,6 +17,12 @@ public class PacienteConfiguration : IEntityTypeConfiguration<Paciente>
 
 		builder.Property(x => x.FotoUrl)
 			.HasMaxLength(500);
+
+		builder.Property(x => x.Pontos)
+			.HasDefaultValue(0);
+
+		builder.Property(x => x.Nivel)
+			.HasDefaultValue(1);
 
 		builder.Property(x => x.CriadoEm)
 			.IsRequired();

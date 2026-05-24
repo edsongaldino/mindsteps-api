@@ -11,6 +11,7 @@ public class PacienteCreateDto
 	public Guid PsicologoId { get; set; }
 	public string Nome { get; set; } = string.Empty;
 	public string Email { get; set; } = string.Empty;
+	public string? Telefone { get; set; }
 	public string Senha { get; set; } = string.Empty;
 	public DateTime? DataNascimento { get; set; }
 	public string? Genero { get; set; }
@@ -23,16 +24,26 @@ public class PacienteResponseDto
 	public Guid PsicologoId { get; set; }
 	public string Nome { get; set; } = string.Empty;
 	public string Email { get; set; } = string.Empty;
+	public string? Telefone { get; set; }
 	public DateTime? DataNascimento { get; set; }
 	public string? Genero { get; set; }
 	public string? FotoUrl { get; set; }
+	public int Pontos { get; set; }
+	public int Nivel { get; set; }
 	public bool Ativo { get; set; }
+	public string? Anotacoes { get; set; }
 }
 
 public class PacienteUpdateDto
 {
 	public string Nome { get; set; } = string.Empty;
 	public string Email { get; set; } = string.Empty;
+	public string? Telefone { get; set; }
 	public DateTime? DataNascimento { get; set; }
 	public string? Genero { get; set; }
+}
+
+public class PacienteAnotacoesDto
+{
+	public string? Anotacoes { get; set; }
 }

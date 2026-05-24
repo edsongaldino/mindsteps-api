@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
 using MindSteps.Infrastructure.Data;
@@ -55,6 +55,7 @@ public class AtividadeRepository : IAtividadeRepository
 			.AsNoTracking()
 			.Include(x => x.Atividade)
 			.Where(x => x.PacienteId == pacienteId)
+			.OrderByDescending(x => x.DataEnvio)
 			.ToListAsync();
 	}
 

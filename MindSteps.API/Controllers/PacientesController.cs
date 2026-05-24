@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
+using System.Security.Claims;
 
 namespace MindSteps.API.Controllers;
 
@@ -58,11 +59,25 @@ public class PacientesController : ControllerBase
 	}
 
 	[HttpPut("{id:guid}")]
-	[Authorize(Roles = "Psicologo")]
+	[Authorize(Roles = "Psicologo,Paciente")]
 	public async Task<IActionResult> Atualizar(Guid id, [FromBody] PacienteUpdateDto dto)
 	{
 		try
 		{
+			if (User.IsInRole("Paciente"))
+			{
+				var usuarioIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				if (!string.IsNullOrWhiteSpace(usuarioIdClaim))
+				{
+					var usuarioId = Guid.Parse(usuarioIdClaim);
+					var pacienteExistente = await _pacienteService.ObterPorIdAsync(id);
+					if (pacienteExistente == null || pacienteExistente.UsuarioId != usuarioId)
+					{
+						return StatusCode(403, new { message = "Você só pode atualizar o seu próprio perfil." });
+					}
+				}
+			}
+
 			var paciente = await _pacienteService.AtualizarAsync(id, dto);
 
 			if (paciente is null)
@@ -86,5 +101,17 @@ public class PacientesController : ControllerBase
 			return NotFound();
 
 		return NoContent();
+	}
+
+	[HttpPatch("{id:guid}/anotacoes")]
+	[Authorize(Roles = "Psicologo")]
+	public async Task<IActionResult> AtualizarAnotacoes(Guid id, [FromBody] PacienteAnotacoesDto dto)
+	{
+		var sucesso = await _pacienteService.AtualizarAnotacoesAsync(id, dto.Anotacoes);
+
+		if (!sucesso)
+			return NotFound();
+
+		return Ok(new { message = "Anotações particulares atualizadas com sucesso." });
 	}
 }

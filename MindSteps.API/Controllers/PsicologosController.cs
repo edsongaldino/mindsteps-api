@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
+using System.Security.Claims;
 
 namespace MindSteps.API.Controllers;
 
@@ -55,11 +56,25 @@ public class PsicologosController : ControllerBase
 	}
 
 	[HttpPut("{id:guid}")]
-	[Authorize(Roles = "Administrador")]
+	[Authorize(Roles = "Administrador,Psicologo")]
 	public async Task<IActionResult> Atualizar(Guid id, [FromBody] PsicologoUpdateDto dto)
 	{
 		try
 		{
+			if (User.IsInRole("Psicologo"))
+			{
+				var usuarioIdClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+				if (!string.IsNullOrWhiteSpace(usuarioIdClaim))
+				{
+					var usuarioId = Guid.Parse(usuarioIdClaim);
+					var psicologoExistente = await _psicologoService.ObterPorIdAsync(id);
+					if (psicologoExistente == null || psicologoExistente.UsuarioId != usuarioId)
+					{
+						return StatusCode(403, new { message = "Você só pode atualizar o seu próprio perfil." });
+					}
+				}
+			}
+
 			var psicologo = await _psicologoService.AtualizarAsync(id, dto);
 
 			if (psicologo is null)

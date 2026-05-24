@@ -10,4 +10,5 @@ public interface IPacienteService
 	Task<PacienteResponseDto> CriarAsync(PacienteCreateDto dto);
 	Task<PacienteResponseDto?> AtualizarAsync(Guid id, PacienteUpdateDto dto);
 	Task<bool> DesativarAsync(Guid id);
+	Task<bool> AtualizarAnotacoesAsync(Guid id, string? anotacoes);
 }
