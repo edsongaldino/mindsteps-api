@@ -32,7 +32,9 @@ var key = Encoding.ASCII.GetBytes(secret);
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-	options.UseNpgsql(configuration.GetConnectionString("Default")));
+	options.UseNpgsql(
+		configuration.GetConnectionString("Default"),
+		b => b.MigrationsAssembly("MindSteps.Infrastructure")));
 
 // Repositories
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
