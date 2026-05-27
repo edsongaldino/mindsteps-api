@@ -1,4 +1,4 @@
-﻿namespace MindSteps.Domain.Enums;
+namespace MindSteps.Domain.Enums;
 
 public enum TipoAtividade
 {
@@ -7,5 +7,6 @@ public enum TipoAtividade
 	ExercicioPratico = 3,
 	CheckList = 4,
 	Audio = 5,
-	Leitura = 6
+	Leitura = 6,
+	Jogo = 7
 }
