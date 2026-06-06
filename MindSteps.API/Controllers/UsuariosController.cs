@@ -138,4 +138,21 @@ public class UsuariosController : ControllerBase
 			return StatusCode(500, new { message = $"Erro ao salvar a imagem: {ex.Message}" });
 		}
 	}
+
+	[HttpPost("{id:guid}/device-token")]
+	public async Task<IActionResult> RegistrarDeviceToken(Guid id, [FromBody] RegistrarDeviceTokenDto dto)
+	{
+		if (string.IsNullOrWhiteSpace(dto.DeviceToken))
+			return BadRequest(new { message = "DeviceToken não pode ser vazio." });
+
+		try
+		{
+			await _usuarioService.RegistrarDeviceTokenAsync(id, dto.DeviceToken, dto.Plataforma);
+			return Ok(new { message = "Token registrado com sucesso." });
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
 }

@@ -11,15 +11,18 @@ public class AtividadeService : IAtividadeService
 	private readonly IAtividadeRepository _atividadeRepository;
 	private readonly IPsicologoRepository _psicologoRepository;
 	private readonly IPacienteRepository _pacienteRepository;
+	private readonly INotificacaoService _notificacaoService;
 
 	public AtividadeService(
 		IAtividadeRepository atividadeRepository,
 		IPsicologoRepository psicologoRepository,
-		IPacienteRepository pacienteRepository)
+		IPacienteRepository pacienteRepository,
+		INotificacaoService notificacaoService)
 	{
 		_atividadeRepository = atividadeRepository;
 		_psicologoRepository = psicologoRepository;
 		_pacienteRepository = pacienteRepository;
+		_notificacaoService = notificacaoService;
 	}
 
 	public async Task<IEnumerable<AtividadeResponseDto>> ObterTodasAsync()
@@ -117,6 +120,23 @@ public class AtividadeService : IAtividadeService
 		await _atividadeRepository.SalvarAlteracoesAsync();
 
 		atividadePaciente.Atividade = atividade;
+
+		try
+		{
+			var titulo = "Nova atividade recebida";
+			var corpo = $"Seu psicólogo te enviou a atividade: {atividade.Titulo}";
+			var dados = new Dictionary<string, string>
+			{
+				{ "type", "activity" },
+				{ "atividadePacienteId", atividadePaciente.Id.ToString() }
+			};
+
+			await _notificacaoService.EnviarNotificacaoUsuarioAsync(paciente.UsuarioId, titulo, corpo, dados);
+		}
+		catch
+		{
+			// Evita falhar o envio da atividade se o serviço de notificação falhar
+		}
 
 		return MapToAtividadePacienteResponse(atividadePaciente);
 	}

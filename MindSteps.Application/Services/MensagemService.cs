@@ -14,15 +14,18 @@ public class MensagemService : IMensagemService
 	private readonly IMensagemRepository _mensagemRepository;
 	private readonly IPsicologoRepository _psicologoRepository;
 	private readonly IPacienteRepository _pacienteRepository;
+	private readonly INotificacaoService _notificacaoService;
 
 	public MensagemService(
 		IMensagemRepository mensagemRepository,
 		IPsicologoRepository psicologoRepository,
-		IPacienteRepository pacienteRepository)
+		IPacienteRepository pacienteRepository,
+		INotificacaoService notificacaoService)
 	{
 		_mensagemRepository = mensagemRepository;
 		_psicologoRepository = psicologoRepository;
 		_pacienteRepository = pacienteRepository;
+		_notificacaoService = notificacaoService;
 	}
 
 	public async Task<MensagemResponseDto> EnviarMensagemAsync(Guid psicologoId, MensagemCreateDto dto)
@@ -55,6 +58,26 @@ public class MensagemService : IMensagemService
 
 		mensagem.Psicologo = psicologo;
 		mensagem.Paciente = paciente;
+
+		try
+		{
+			var titulo = $"Nova mensagem de {psicologo.Usuario.Nome}";
+			var corpo = mensagem.Conteudo.Length > 100 
+				? mensagem.Conteudo.Substring(0, 97) + "..." 
+				: mensagem.Conteudo;
+
+			var dados = new Dictionary<string, string>
+			{
+				{ "type", "message" },
+				{ "mensagemId", mensagem.Id.ToString() }
+			};
+
+			await _notificacaoService.EnviarNotificacaoUsuarioAsync(paciente.UsuarioId, titulo, corpo, dados);
+		}
+		catch
+		{
+			// Evita falhar o envio da mensagem se o serviço de notificação falhar
+		}
 
 		return MapToResponse(mensagem);
 	}

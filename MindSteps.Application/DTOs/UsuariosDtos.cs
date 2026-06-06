@@ -29,3 +29,9 @@ public class UsuarioUpdateDto
 	public string? Telefone { get; set; }
 	public PerfilUsuario Perfil { get; set; }
 }
+
+public class RegistrarDeviceTokenDto
+{
+	public string DeviceToken { get; set; } = string.Empty;
+	public string Plataforma { get; set; } = string.Empty;
+}

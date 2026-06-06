@@ -10,4 +10,5 @@ public interface IUsuarioService
 	Task<UsuarioResponseDto?> AtualizarAsync(Guid id, UsuarioUpdateDto dto);
 	Task<bool> DesativarAsync(Guid id);
 	Task<string?> AtualizarFotoAsync(Guid id, string fotoUrl);
+	Task RegistrarDeviceTokenAsync(Guid usuarioId, string deviceToken, string plataforma);
 }

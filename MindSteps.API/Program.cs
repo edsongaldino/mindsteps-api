@@ -9,6 +9,7 @@ using MindSteps.Infrastructure.Data;
 using MindSteps.Infrastructure.Data.Seed;
 using MindSteps.Infrastructure.Repositories;
 using MindSteps.SharedKernel.Security;
+using MindSteps.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,7 @@ builder.Services.AddScoped<ICheckInEmocionalService, CheckInEmocionalService>();
 builder.Services.AddScoped<IRegistroPensamentoService, RegistroPensamentoService>();
 builder.Services.AddScoped<IMensagemService, MensagemService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<INotificacaoService, NotificacaoService>();
 
 builder.Services
 	.AddAuthentication(options =>

@@ -11,4 +11,6 @@ public interface IUsuarioRepository
 	Task AdicionarAsync(Usuario usuario);
 	Task SalvarAlteracoesAsync();
 	Task<Usuario?> ObterComPerfisPorIdAsync(Guid id);
+	Task RegistrarDeviceTokenAsync(Guid usuarioId, string deviceToken, string plataforma);
+	Task<List<string>> ObterDeviceTokensUsuarioAsync(Guid usuarioId);
 }

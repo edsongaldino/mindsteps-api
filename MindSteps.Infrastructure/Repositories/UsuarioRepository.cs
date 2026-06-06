@@ -64,4 +64,35 @@ public class UsuarioRepository : IUsuarioRepository
 			.Include(x => x.Paciente)
 			.FirstOrDefaultAsync(x => x.Id == id);
 	}
+
+	public async Task RegistrarDeviceTokenAsync(Guid usuarioId, string deviceToken, string plataforma)
+	{
+		var tokensExistentes = await _context.UsuariosDispositivos
+			.Where(x => x.DeviceToken == deviceToken)
+			.ToListAsync();
+
+		if (tokensExistentes.Any())
+		{
+			_context.UsuariosDispositivos.RemoveRange(tokensExistentes);
+		}
+
+		var novoDispositivo = new UsuarioDispositivo
+		{
+			UsuarioId = usuarioId,
+			DeviceToken = deviceToken,
+			Plataforma = plataforma,
+			AtualizadoEm = DateTime.UtcNow
+		};
+
+		await _context.UsuariosDispositivos.AddAsync(novoDispositivo);
+		await _context.SaveChangesAsync();
+	}
+
+	public async Task<List<string>> ObterDeviceTokensUsuarioAsync(Guid usuarioId)
+	{
+		return await _context.UsuariosDispositivos
+			.Where(x => x.UsuarioId == usuarioId)
+			.Select(x => x.DeviceToken)
+			.ToListAsync();
+	}
 }

@@ -137,4 +137,9 @@ public class UsuarioService : IUsuarioService
 
 		return fotoUrl;
 	}
+
+	public async Task RegistrarDeviceTokenAsync(Guid usuarioId, string deviceToken, string plataforma)
+	{
+		await _usuarioRepository.RegistrarDeviceTokenAsync(usuarioId, deviceToken, plataforma);
+	}
 }
