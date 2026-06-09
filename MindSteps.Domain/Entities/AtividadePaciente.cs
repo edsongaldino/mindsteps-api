@@ -1,4 +1,4 @@
-﻿using MindSteps.Domain.Enums;
+using MindSteps.Domain.Enums;
 
 namespace MindSteps.Domain.Entities;
 
@@ -29,4 +29,6 @@ public class AtividadePaciente
 	public string? FeedbackPsicologo { get; set; }
 
 	public DateTime? FeedbackEnviadoEm { get; set; }
+
+	public bool NotificacaoVencimentoEnviada { get; set; } = false;
 }

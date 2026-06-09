@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
 	public DbSet<RegistroPensamento> RegistrosPensamentos => Set<RegistroPensamento>();
 	public DbSet<Mensagem> Mensagens => Set<Mensagem>();
 	public DbSet<UsuarioDispositivo> UsuariosDispositivos => Set<UsuarioDispositivo>();
+	public DbSet<RegistroJogo> RegistrosJogos => Set<RegistroJogo>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

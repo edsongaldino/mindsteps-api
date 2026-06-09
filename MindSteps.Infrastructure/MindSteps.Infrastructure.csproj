@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MindSteps.Domain\MindSteps.Domain.csproj" />
+    <ProjectReference Include="..\MindSteps.Application\MindSteps.Application.csproj" />
   </ItemGroup>
 
 </Project>

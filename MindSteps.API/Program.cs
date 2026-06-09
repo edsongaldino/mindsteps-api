@@ -57,6 +57,8 @@ builder.Services.AddScoped<IRegistroPensamentoService, RegistroPensamentoService
 builder.Services.AddScoped<IMensagemService, MensagemService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<INotificacaoService, NotificacaoService>();
+builder.Services.AddScoped<IDashboardService, MindSteps.Infrastructure.Services.DashboardService>();
+builder.Services.AddHostedService<MindSteps.API.Services.VencimentoAtividadesWorker>();
 
 builder.Services
 	.AddAuthentication(options =>

@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MindSteps.Infrastructure.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MindSteps.Infrastructure.Migrations
+namespace GestaoCE.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260607224127_AddNotificacaoVencimentoAtividade")]
+    partial class AddNotificacaoVencimentoAtividade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -325,39 +328,6 @@ namespace MindSteps.Infrastructure.Migrations
                     b.ToTable("Psicologos", (string)null);
                 });
 
-            modelBuilder.Entity("MindSteps.Domain.Entities.RegistroJogo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("AtividadePacienteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DadosPlay")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DataPlay")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("JogoId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("PacienteId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AtividadePacienteId");
-
-                    b.HasIndex("PacienteId");
-
-                    b.ToTable("RegistrosJogos", (string)null);
-                });
-
             modelBuilder.Entity("MindSteps.Domain.Entities.RegistroPensamento", b =>
                 {
                     b.Property<Guid>("Id")
@@ -582,24 +552,6 @@ namespace MindSteps.Infrastructure.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("MindSteps.Domain.Entities.RegistroJogo", b =>
-                {
-                    b.HasOne("MindSteps.Domain.Entities.AtividadePaciente", "AtividadePaciente")
-                        .WithMany()
-                        .HasForeignKey("AtividadePacienteId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("MindSteps.Domain.Entities.Paciente", "Paciente")
-                        .WithMany("RegistrosJogos")
-                        .HasForeignKey("PacienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AtividadePaciente");
-
-                    b.Navigation("Paciente");
-                });
-
             modelBuilder.Entity("MindSteps.Domain.Entities.RegistroPensamento", b =>
                 {
                     b.HasOne("MindSteps.Domain.Entities.AtividadePaciente", "AtividadePaciente")
@@ -639,8 +591,6 @@ namespace MindSteps.Infrastructure.Migrations
                     b.Navigation("AtividadesRecebidas");
 
                     b.Navigation("CheckInsEmocionais");
-
-                    b.Navigation("RegistrosJogos");
 
                     b.Navigation("RegistrosPensamentos");
                 });

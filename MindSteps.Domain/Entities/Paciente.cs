@@ -32,5 +32,7 @@ public class Paciente
 
 	public ICollection<RegistroPensamento> RegistrosPensamentos { get; set; } = new List<RegistroPensamento>();
 
+	public ICollection<RegistroJogo> RegistrosJogos { get; set; } = new List<RegistroJogo>();
+
 	public string? Anotacoes { get; set; }
 }
