@@ -55,6 +55,21 @@ public class PsicologosController : ControllerBase
 		}
 	}
 
+	[HttpPost("registrar")]
+	[AllowAnonymous]
+	public async Task<IActionResult> Registrar([FromBody] PsicologoCreateDto dto)
+	{
+		try
+		{
+			var psicologo = await _psicologoService.CriarAsync(dto);
+			return CreatedAtAction(nameof(ObterPorId), new { id = psicologo.Id }, psicologo);
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
 	[HttpPut("{id:guid}")]
 	[Authorize(Roles = "Administrador,Psicologo")]
 	public async Task<IActionResult> Atualizar(Guid id, [FromBody] PsicologoUpdateDto dto)
