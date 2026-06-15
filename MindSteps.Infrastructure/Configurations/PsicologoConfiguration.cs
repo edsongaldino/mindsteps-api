@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MindSteps.Domain.Entities;
 
@@ -15,6 +15,22 @@ public class PsicologoConfiguration : IEntityTypeConfiguration<Psicologo>
 		builder.Property(x => x.Crp)
 			.IsRequired()
 			.HasMaxLength(30);
+
+		builder.Property(x => x.Documento)
+			.IsRequired()
+			.HasMaxLength(20);
+
+		builder.Property(x => x.AsaasCustomerId)
+			.HasMaxLength(50);
+
+		builder.Property(x => x.AsaasSubscriptionId)
+			.HasMaxLength(50);
+
+		builder.Property(x => x.Pago)
+			.IsRequired();
+
+		builder.Property(x => x.Plano)
+			.HasMaxLength(50);
 
 		builder.Property(x => x.Bio)
 			.HasMaxLength(1000);

@@ -11,4 +11,5 @@ public interface IPsicologoService
 	Task<PsicologoResponseDto?> AtualizarAsync(Guid id, PsicologoUpdateDto dto);
 	Task<bool> AprovarAsync(Guid id);
 	Task<bool> ReprovarAsync(Guid id);
+	Task<bool> AtualizarStatusPagamentoAsync(string subscriptionId, bool pago);
 }

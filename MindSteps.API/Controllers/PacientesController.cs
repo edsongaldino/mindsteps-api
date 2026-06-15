@@ -11,10 +11,17 @@ namespace MindSteps.API.Controllers;
 public class PacientesController : ControllerBase
 {
 	private readonly IPacienteService _pacienteService;
+	private readonly IPsicologoService _psicologoService;
+	private readonly IIaService _iaService;
 
-	public PacientesController(IPacienteService pacienteService)
+	public PacientesController(
+		IPacienteService pacienteService,
+		IPsicologoService psicologoService,
+		IIaService iaService)
 	{
 		_pacienteService = pacienteService;
+		_psicologoService = psicologoService;
+		_iaService = iaService;
 	}
 
 	[HttpGet]
@@ -41,6 +48,28 @@ public class PacientesController : ControllerBase
 			return NotFound();
 
 		return Ok(paciente);
+	}
+
+	[HttpGet("{id:guid}/ia-insights")]
+	[Authorize(Roles = "Psicologo")]
+	public async Task<IActionResult> ObterInsightsIa(Guid id)
+	{
+		var paciente = await _pacienteService.ObterPorIdAsync(id);
+		if (paciente is null)
+			return NotFound(new { message = "Paciente não encontrado." });
+
+		var psicologo = await _psicologoService.ObterPorIdAsync(paciente.PsicologoId);
+		if (psicologo is null)
+			return NotFound(new { message = "Psicólogo associado não encontrado." });
+
+		var plano = psicologo.Plano ?? "Starter";
+		if (plano.ToLower() != "profissional" && plano.ToLower() != "clinica")
+		{
+			return StatusCode(403, new { message = "Insights por IA estão disponíveis apenas nos planos Profissional e Clínica. Faça o upgrade de seu plano." });
+		}
+
+		var insights = await _iaService.GerarInsightsClinicosAsync(id);
+		return Ok(insights);
 	}
 
 	[HttpPost]

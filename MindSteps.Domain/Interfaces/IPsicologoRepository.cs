@@ -1,4 +1,4 @@
-﻿using MindSteps.Domain.Entities;
+using MindSteps.Domain.Entities;
 
 namespace MindSteps.Domain.Interfaces;
 
@@ -8,6 +8,7 @@ public interface IPsicologoRepository
 	Task<List<Psicologo>> ObterPendentesAsync();
 	Task<Psicologo?> ObterPorIdAsync(Guid id);
 	Task<bool> ExisteCrpAsync(string crp);
+	Task<Psicologo?> ObterPorSubscriptionIdAsync(string subscriptionId);
 	Task AdicionarAsync(Psicologo psicologo);
 	Task SalvarAlteracoesAsync();
 }

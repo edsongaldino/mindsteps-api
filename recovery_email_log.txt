@@ -1,0 +1,17 @@
+Data/Hora: 14/06/2026 19:14:57
+Para: paciente@mindsteps.com
+Assunto: MindSteps - Recuperação de Senha
+
+Olá Ana Clara Müller,
+
+Recebemos uma solicitação de recuperação de senha para sua conta MindSteps.
+Seu token de recuperação simulado é: 414308d6
+
+Para redefinir sua senha, acesse o link de recuperação.
+Caso não tenha solicitado a alteração, desconsidere este e-mail.
+
+Atenciosamente,
+Equipe MindSteps
+
+==================================================
+

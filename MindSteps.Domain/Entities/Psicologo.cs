@@ -1,4 +1,4 @@
-﻿namespace MindSteps.Domain.Entities;
+namespace MindSteps.Domain.Entities;
 
 public class Psicologo
 {
@@ -9,6 +9,16 @@ public class Psicologo
 	public Usuario Usuario { get; set; } = null!;
 
 	public string Crp { get; set; } = string.Empty;
+
+	public string Documento { get; set; } = string.Empty;
+
+	public string? AsaasCustomerId { get; set; }
+
+	public string? AsaasSubscriptionId { get; set; }
+
+	public bool Pago { get; set; } = false;
+
+	public string? Plano { get; set; }
 
 	public string? Bio { get; set; }
 

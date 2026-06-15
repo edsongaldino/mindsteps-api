@@ -12,4 +12,6 @@ public class MeResponseDto
 	public int? Pontos { get; set; }
 	public int? Nivel { get; set; }
 	public string? FotoUrl { get; set; }
+	public bool Aprovado { get; set; } = true;
+	public string? Plano { get; set; }
 }

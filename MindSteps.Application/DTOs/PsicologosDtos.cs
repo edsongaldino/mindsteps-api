@@ -13,6 +13,8 @@ public class PsicologoCreateDto
 	public string? Telefone { get; set; }
 	public string Senha { get; set; } = string.Empty;
 	public string Crp { get; set; } = string.Empty;
+	public string Documento { get; set; } = string.Empty;
+	public string Plano { get; set; } = string.Empty;
 	public string? Bio { get; set; }
 }
 
@@ -25,6 +27,11 @@ public class PsicologoResponseDto
 	public string Email { get; set; } = string.Empty;
 	public string? Telefone { get; set; }
 	public string Crp { get; set; } = string.Empty;
+	public string Documento { get; set; } = string.Empty;
+	public string? Plano { get; set; }
+	public bool Pago { get; set; }
+	public string? PaymentUrl { get; set; }
+	public string? PixCopyPaste { get; set; }
 	public string? Bio { get; set; }
 	public string? FotoUrl { get; set; }
 	public bool Aprovado { get; set; }

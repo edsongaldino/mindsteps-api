@@ -14,4 +14,10 @@ public class AuthResponseDto
 	public string Email { get; set; } = string.Empty;
 	public string Perfil { get; set; } = string.Empty;
 	public string? FotoUrl { get; set; }
+	public bool Aprovado { get; set; } = true;
+}
+
+public class RecuperarSenhaDto
+{
+	public string Email { get; set; } = string.Empty;
 }

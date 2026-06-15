@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Interfaces;
 using MindSteps.Infrastructure.Data;
@@ -42,6 +42,13 @@ public class PsicologoRepository : IPsicologoRepository
 	{
 		return await _context.Psicologos
 			.AnyAsync(x => x.Crp == crp);
+	}
+
+	public async Task<Psicologo?> ObterPorSubscriptionIdAsync(string subscriptionId)
+	{
+		return await _context.Psicologos
+			.Include(x => x.Usuario)
+			.FirstOrDefaultAsync(x => x.AsaasSubscriptionId == subscriptionId);
 	}
 
 	public async Task AdicionarAsync(Psicologo psicologo)

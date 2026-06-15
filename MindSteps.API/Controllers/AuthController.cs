@@ -19,12 +19,34 @@ public class AuthController : ControllerBase
 	[HttpPost("login")]
 	public async Task<IActionResult> Login([FromBody] LoginDto login)
 	{
-		var response = await _service.AutenticarAsync(login);
+		try
+		{
+			var response = await _service.AutenticarAsync(login);
 
-		if (response is null)
-			return Unauthorized("Credenciais inválidas");
+			if (response is null)
+				return Unauthorized("Credenciais inválidas");
 
-		return Ok(response);
+			return Ok(response);
+		}
+		catch (System.Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
+	[AllowAnonymous]
+	[HttpPost("recuperar-senha")]
+	public async Task<IActionResult> RecuperarSenha([FromBody] RecuperarSenhaDto dto)
+	{
+		try
+		{
+			await _service.RecuperarSenhaAsync(dto.Email);
+			return Ok(new { message = "E-mail de recuperação enviado com sucesso!" });
+		}
+		catch (System.Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
 	}
 
 	[Authorize]

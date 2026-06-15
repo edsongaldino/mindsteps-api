@@ -96,6 +96,26 @@ public class PacienteService : IPacienteService
 		if (psicologo is null || !psicologo.Aprovado)
 			throw new Exception("Psicólogo não encontrado ou ainda não aprovado.");
 
+		// Validação de limites de pacientes ativos baseado no plano contratado
+		var plano = psicologo.Plano ?? "Starter";
+		var limite = plano.ToLower() switch
+		{
+			"starter" => 5,
+			"essencial" => 20,
+			_ => int.MaxValue
+		};
+
+		if (limite < int.MaxValue)
+		{
+			var pacientes = await _pacienteRepository.ObterPorPsicologoAsync(dto.PsicologoId);
+			var contagemAtivos = pacientes.Count(x => x.Usuario.Ativo);
+
+			if (contagemAtivos >= limite)
+			{
+				throw new Exception($"Você atingiu o limite de {limite} pacientes ativos para o seu plano ({plano}). Faça o upgrade para cadastrar novos pacientes.");
+			}
+		}
+
 		var emailExiste = await _usuarioRepository.ExisteEmailAsync(dto.Email);
 
 		if (emailExiste)
