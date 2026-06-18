@@ -53,7 +53,7 @@ jobs:
             set -e
             cd /root/apps/mindsteps/api
             # Se o pacote for privado, descomente o login abaixo:
-            # docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker compose pull api
             docker compose up -d
             docker image prune -f
