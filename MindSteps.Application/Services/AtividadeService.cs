@@ -105,7 +105,21 @@ public class AtividadeService : IAtividadeService
 			throw new Exception("Este paciente não pertence ao psicólogo responsável pela atividade.");
 
 		if (paciente.Nivel < atividade.Nivel)
-			throw new Exception($"O paciente está no nível {paciente.Nivel} e esta atividade exige o nível {atividade.Nivel}. Estimule a participação do paciente para liberar!");
+		{
+			return new AtividadePacienteResponseDto
+			{
+				Id = Guid.Empty,
+				AtividadeId = dto.AtividadeId,
+				PacienteId = dto.PacienteId,
+				Titulo = atividade.Titulo,
+				Descricao = atividade.Descricao,
+				Conteudo = atividade.Conteudo,
+				Tipo = atividade.Tipo,
+				Status = StatusAtividadePaciente.Cancelada,
+				Nivel = atividade.Nivel,
+				DataEnvio = DateTime.UtcNow
+			};
+		}
 
 		var atividadePaciente = new AtividadePaciente
 		{
