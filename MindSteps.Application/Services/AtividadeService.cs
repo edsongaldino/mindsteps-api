@@ -98,8 +98,25 @@ public class AtividadeService : IAtividadeService
 
 		var paciente = await _pacienteRepository.ObterPorIdAsync(dto.PacienteId);
 
-		if (paciente is null || !paciente.Usuario.Ativo)
-			throw new Exception("Paciente não encontrado ou inativo.");
+		if (paciente is null)
+			throw new Exception("Paciente não encontrado.");
+
+		if (!paciente.Usuario.Ativo)
+		{
+			return new AtividadePacienteResponseDto
+			{
+				Id = Guid.Empty,
+				AtividadeId = dto.AtividadeId,
+				PacienteId = dto.PacienteId,
+				Titulo = atividade.Titulo,
+				Descricao = atividade.Descricao,
+				Conteudo = atividade.Conteudo,
+				Tipo = atividade.Tipo,
+				Status = StatusAtividadePaciente.Cancelada,
+				Nivel = atividade.Nivel,
+				DataEnvio = DateTime.UtcNow
+			};
+		}
 
 		if (paciente.PsicologoId != atividade.PsicologoId)
 			throw new Exception("Este paciente não pertence ao psicólogo responsável pela atividade.");
