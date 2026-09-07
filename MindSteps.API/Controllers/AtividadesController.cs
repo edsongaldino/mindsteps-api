@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MindSteps.Application.DTOs;
 using MindSteps.Application.Interfaces;
@@ -10,10 +12,12 @@ namespace MindSteps.API.Controllers;
 public class AtividadesController : ControllerBase
 {
 	private readonly IAtividadeService _atividadeService;
+	private readonly IWebHostEnvironment _env;
 
-	public AtividadesController(IAtividadeService atividadeService)
+	public AtividadesController(IAtividadeService atividadeService, IWebHostEnvironment env)
 	{
 		_atividadeService = atividadeService;
+		_env = env;
 	}
 
 	[HttpGet]
@@ -90,5 +94,36 @@ public class AtividadesController : ControllerBase
 		{
 			return BadRequest(new { message = ex.Message });
 		}
+	}
+
+	[HttpPost("upload-media")]
+	[Consumes("multipart/form-data")]
+	public async Task<IActionResult> UploadMedia(IFormFile file)
+	{
+		if (file == null || file.Length == 0)
+			return BadRequest(new { message = "Nenhum arquivo enviado." });
+
+		var allowedExtensions = new[] { ".mp3", ".m4a", ".wav", ".aac", ".ogg", ".mp4", ".mov", ".avi", ".pdf", ".png", ".jpg", ".jpeg" };
+		var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+		if (!allowedExtensions.Contains(ext))
+			return BadRequest(new { message = "Formato de arquivo não suportado." });
+
+		if (file.Length > 50 * 1024 * 1024) // 50 MB
+			return BadRequest(new { message = "O arquivo não pode ser maior que 50MB." });
+
+		var uploadsRoot = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "atividades");
+		if (!Directory.Exists(uploadsRoot))
+			Directory.CreateDirectory(uploadsRoot);
+
+		var uniqueFileName = $"{Guid.NewGuid()}{ext}";
+		var filePath = Path.Combine(uploadsRoot, uniqueFileName);
+
+		using (var stream = new FileStream(filePath, FileMode.Create))
+		{
+			await file.CopyToAsync(stream);
+		}
+
+		var publicUrl = $"/uploads/atividades/{uniqueFileName}";
+		return Ok(new { url = publicUrl, fileName = file.FileName, size = file.Length });
 	}
 }

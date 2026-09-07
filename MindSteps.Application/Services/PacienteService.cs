@@ -174,6 +174,10 @@ public class PacienteService : IPacienteService
 		paciente.Usuario.Telefone = dto.Telefone;
 		paciente.DataNascimento = dto.DataNascimento;
 		paciente.Genero = dto.Genero;
+		if (dto.FotoUrl != null)
+		{
+			paciente.FotoUrl = dto.FotoUrl;
+		}
 		paciente.AtualizadoEm = DateTime.UtcNow;
 		paciente.Usuario.AtualizadoEm = DateTime.UtcNow;
 

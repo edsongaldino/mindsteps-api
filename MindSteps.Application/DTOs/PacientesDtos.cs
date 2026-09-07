@@ -41,6 +41,7 @@ public class PacienteUpdateDto
 	public string? Telefone { get; set; }
 	public DateTime? DataNascimento { get; set; }
 	public string? Genero { get; set; }
+	public string? FotoUrl { get; set; }
 }
 
 public class PacienteAnotacoesDto
