@@ -45,4 +45,5 @@ public class PsicologoUpdateDto
 	public string? Telefone { get; set; }
 	public string Crp { get; set; } = string.Empty;
 	public string? Bio { get; set; }
+	public string? Senha { get; set; }
 }

@@ -216,6 +216,12 @@ public class PsicologoService : IPsicologoService
 		psicologo.Usuario.Telefone = dto.Telefone;
 		psicologo.Crp = dto.Crp;
 		psicologo.Bio = dto.Bio;
+		
+		if (!string.IsNullOrWhiteSpace(dto.Senha))
+		{
+			psicologo.Usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
+		}
+
 		psicologo.AtualizadoEm = DateTime.UtcNow;
 		psicologo.Usuario.AtualizadoEm = DateTime.UtcNow;
 

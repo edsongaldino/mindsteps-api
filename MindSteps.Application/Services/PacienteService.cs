@@ -178,6 +178,12 @@ public class PacienteService : IPacienteService
 		{
 			paciente.FotoUrl = dto.FotoUrl;
 		}
+
+		if (!string.IsNullOrWhiteSpace(dto.Senha))
+		{
+			paciente.Usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
+		}
+
 		paciente.AtualizadoEm = DateTime.UtcNow;
 		paciente.Usuario.AtualizadoEm = DateTime.UtcNow;
 
