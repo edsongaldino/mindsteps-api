@@ -55,14 +55,29 @@ public class PsicologosController : ControllerBase
 		}
 	}
 
-	[HttpPost("registrar")]
+	[HttpPost("solicitar-cadastro")]
 	[AllowAnonymous]
-	public async Task<IActionResult> Registrar([FromBody] PsicologoCreateDto dto)
+	public async Task<IActionResult> SolicitarCadastro([FromBody] PsicologoCreateDto dto)
 	{
 		try
 		{
-			var psicologo = await _psicologoService.CriarAsync(dto);
-			return CreatedAtAction(nameof(ObterPorId), new { id = psicologo.Id }, psicologo);
+			var psicologoId = await _psicologoService.SolicitarCadastroAsync(dto);
+			return Ok(new { message = "Código de validação enviado para o e-mail." });
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
+	[HttpPost("validar-cadastro")]
+	[AllowAnonymous]
+	public async Task<IActionResult> ValidarCadastro([FromBody] ValidarCadastroDto dto)
+	{
+		try
+		{
+			var response = await _psicologoService.ValidarCadastroAsync(dto);
+			return Ok(response);
 		}
 		catch (Exception ex)
 		{

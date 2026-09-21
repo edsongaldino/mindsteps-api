@@ -59,6 +59,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<INotificacaoService, NotificacaoService>();
 builder.Services.AddScoped<IDashboardService, MindSteps.Infrastructure.Services.DashboardService>();
 builder.Services.AddScoped<IIaService, IaService>();
+builder.Services.AddScoped<IEmailService, MindSteps.Infrastructure.Services.SmtpEmailService>();
 builder.Services.AddHttpClient<IAsaasService, AsaasService>();
 builder.Services.AddHostedService<MindSteps.API.Services.VencimentoAtividadesWorker>();
 

@@ -15,3 +15,20 @@ Equipe MindSteps
 
 ==================================================
 
+Data/Hora: 21/09/2026 17:11:30
+Para: edsongaldino@outlook.com
+Assunto: MindSteps - Recuperação de Senha
+
+Olá Edson Galdino,
+
+Recebemos uma solicitação de recuperação de senha para sua conta MindSteps.
+Seu token de recuperação simulado é: 515c50fd
+
+Para redefinir sua senha, acesse o link de recuperação.
+Caso não tenha solicitado a alteração, desconsidere este e-mail.
+
+Atenciosamente,
+Equipe MindSteps
+
+==================================================
+

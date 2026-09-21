@@ -22,6 +22,10 @@ public class Usuario
 
 	public DateTime? AtualizadoEm { get; set; }
 
+	public string? CodigoVerificacao { get; set; }
+
+	public DateTime? CodigoVerificacaoExpiracao { get; set; }
+
 	public Psicologo? Psicologo { get; set; }
 
 	public Paciente? Paciente { get; set; }

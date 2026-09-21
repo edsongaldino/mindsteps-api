@@ -3,6 +3,7 @@ using MindSteps.Application.Interfaces;
 using MindSteps.Domain.Entities;
 using MindSteps.Domain.Enums;
 using MindSteps.Domain.Interfaces;
+using MindSteps.SharedKernel.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,21 @@ public class PsicologoService : IPsicologoService
 	private readonly IPsicologoRepository _psicologoRepository;
 	private readonly IUsuarioRepository _usuarioRepository;
 	private readonly IAsaasService _asaasService;
+	private readonly IEmailService _emailService;
+	private readonly ITokenService _tokenService;
 
 	public PsicologoService(
 		IPsicologoRepository psicologoRepository,
 		IUsuarioRepository usuarioRepository,
-		IAsaasService asaasService)
+		IAsaasService asaasService,
+		IEmailService emailService,
+		ITokenService tokenService)
 	{
 		_psicologoRepository = psicologoRepository;
 		_usuarioRepository = usuarioRepository;
 		_asaasService = asaasService;
+		_emailService = emailService;
+		_tokenService = tokenService;
 	}
 
 	public async Task<IEnumerable<PsicologoResponseDto>> ObterTodosAsync()
@@ -278,5 +285,124 @@ public class PsicologoService : IPsicologoService
 
 		await _psicologoRepository.SalvarAlteracoesAsync();
 		return true;
+	}
+
+	public async Task<Guid> SolicitarCadastroAsync(PsicologoCreateDto dto)
+	{
+		var emailExiste = await _usuarioRepository.ExisteEmailAsync(dto.Email);
+		if (emailExiste) throw new Exception("Já existe um usuário com este e-mail.");
+
+		var crpExiste = await _psicologoRepository.ExisteCrpAsync(dto.Crp);
+		if (crpExiste) throw new Exception("Já existe um psicólogo cadastrado com este CRP.");
+
+		var codigoValidacao = new Random().Next(100000, 999999).ToString();
+
+		var usuario = new Usuario
+		{
+			Nome = dto.Nome,
+			Email = dto.Email.ToLower().Trim(),
+			Telefone = dto.Telefone,
+			SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
+			Perfil = PerfilUsuario.Psicologo,
+			Ativo = false, // Só ativa depois de validar o código
+			CriadoEm = DateTime.UtcNow,
+			CodigoVerificacao = codigoValidacao,
+			CodigoVerificacaoExpiracao = DateTime.UtcNow.AddMinutes(30)
+		};
+
+		var psicologo = new Psicologo
+		{
+			Usuario = usuario,
+			Crp = dto.Crp,
+			Documento = dto.Documento,
+			Plano = "Trial 30 Dias",
+			Pago = false,
+			Aprovado = false,
+			Bio = dto.Bio,
+			CriadoEm = DateTime.UtcNow
+		};
+
+		await _psicologoRepository.AdicionarAsync(psicologo);
+		await _psicologoRepository.SalvarAlteracoesAsync();
+
+		var emailBody = MindSteps.Application.Utils.EmailTemplates.GetVerificationCodeEmail(dto.Nome, codigoValidacao);
+
+		await _emailService.SendEmailAsync(
+			dto.Email,
+			"MindSteps - Código de Validação",
+			emailBody
+		);
+
+		return psicologo.Id;
+	}
+
+	public async Task<AuthResponseDto> ValidarCadastroAsync(ValidarCadastroDto dto)
+	{
+		var usuario = await _usuarioRepository.ObterPorEmailAsync(dto.Email.ToLower().Trim());
+		if (usuario == null || usuario.CodigoVerificacao != dto.Codigo)
+		{
+			throw new Exception("Código de verificação inválido.");
+		}
+		if (usuario.CodigoVerificacaoExpiracao < DateTime.UtcNow)
+		{
+			throw new Exception("Código de verificação expirado.");
+		}
+
+		// Ativa o usuário
+		usuario.Ativo = true;
+		usuario.CodigoVerificacao = null;
+		usuario.CodigoVerificacaoExpiracao = null;
+
+		var psicologo = await _psicologoRepository.ObterPorIdAsync(usuario.Psicologo.Id);
+		if (psicologo != null)
+		{
+			psicologo.Aprovado = true;
+			psicologo.TrialValidoAte = DateTime.UtcNow.AddDays(30);
+
+			// Integração ASAAS
+			if (string.IsNullOrEmpty(psicologo.AsaasSubscriptionId))
+			{
+				try
+				{
+					var asaasCustId = await _asaasService.CreateCustomerAsync(
+						usuario.Nome, 
+						usuario.Email, 
+						psicologo.Documento, 
+						usuario.Telefone
+					);
+					
+					psicologo.AsaasCustomerId = asaasCustId;
+
+					// Criar assinatura com vencimento para 30 dias (Trial)
+					var (subId, paymentUrl, pixCopyPaste) = await _asaasService.CreateSubscriptionAsync(
+						asaasCustId, 
+						psicologo.Plano ?? "Trial 30 Dias", 
+						89.00, // Valor padrão
+						DateTime.Today.AddDays(30)
+					);
+					
+					psicologo.AsaasSubscriptionId = subId;
+				}
+				catch (Exception ex)
+				{
+					// Não impede o login, mas loga o erro ou lida conforme necessário
+					Console.WriteLine($"Erro Asaas: {ex.Message}");
+				}
+			}
+		}
+
+		await _psicologoRepository.SalvarAlteracoesAsync();
+
+		var token = _tokenService.GerarToken(usuario);
+
+		return new AuthResponseDto
+		{
+			Token = token,
+			UsuarioId = usuario.Id,
+			Nome = usuario.Nome,
+			Email = usuario.Email,
+			Perfil = usuario.Perfil.ToString(),
+			Aprovado = psicologo?.Aprovado ?? true
+		};
 	}
 }

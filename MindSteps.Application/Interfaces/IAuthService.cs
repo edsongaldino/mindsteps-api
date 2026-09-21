@@ -7,4 +7,6 @@ public interface IAuthService
 	Task<AuthResponseDto?> AutenticarAsync(LoginDto dto);
 	Task<MeResponseDto?> ObterUsuarioLogadoAsync(Guid usuarioId);
 	Task<bool> RecuperarSenhaAsync(string email);
+	Task<AuthResponseDto> RedefinirSenhaAsync(RedefinirSenhaDto dto);
+	Task<bool> ValidarCodigoRecuperacaoAsync(string email, string codigo);
 }

@@ -49,6 +49,36 @@ public class AuthController : ControllerBase
 		}
 	}
 
+	[AllowAnonymous]
+	[HttpPost("redefinir-senha")]
+	public async Task<IActionResult> RedefinirSenha([FromBody] RedefinirSenhaDto dto)
+	{
+		try
+		{
+			var response = await _service.RedefinirSenhaAsync(dto);
+			return Ok(response);
+		}
+		catch (System.Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
+	[AllowAnonymous]
+	[HttpPost("validar-codigo-recuperacao")]
+	public async Task<IActionResult> ValidarCodigoRecuperacao([FromBody] ValidarCadastroDto dto)
+	{
+		try
+		{
+			await _service.ValidarCodigoRecuperacaoAsync(dto.Email, dto.Codigo);
+			return Ok(new { message = "Código válido!" });
+		}
+		catch (System.Exception ex)
+		{
+			return BadRequest(new { message = ex.Message });
+		}
+	}
+
 	[Authorize]
 	[HttpGet("me")]
 	public async Task<IActionResult> Me()

@@ -30,6 +30,8 @@ public class Psicologo
 
 	public DateTime? AtualizadoEm { get; set; }
 
+	public DateTime? TrialValidoAte { get; set; }
+
 	public ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
 
 	public ICollection<Atividade> Atividades { get; set; } = new List<Atividade>();

@@ -47,3 +47,9 @@ public class PsicologoUpdateDto
 	public string? Bio { get; set; }
 	public string? Senha { get; set; }
 }
+
+public class ValidarCadastroDto
+{
+	public string Email { get; set; } = string.Empty;
+	public string Codigo { get; set; } = string.Empty;
+}

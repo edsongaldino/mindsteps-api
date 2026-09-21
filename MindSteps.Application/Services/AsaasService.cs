@@ -35,7 +35,7 @@ public class AsaasService : IAsaasService
             name = name,
             email = email,
             cpfCnpj = document.Replace(".", "").Replace("-", "").Replace("/", ""),
-            phone = phone
+            phone = phone?.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "")
         };
 
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
@@ -54,7 +54,7 @@ public class AsaasService : IAsaasService
         return doc.RootElement.GetProperty("id").GetString() ?? throw new Exception("ID do cliente não retornado pelo Asaas");
     }
 
-    public async Task<(string SubscriptionId, string PaymentUrl, string PixCopyPaste)> CreateSubscriptionAsync(string customerId, string plan, double value)
+    public async Task<(string SubscriptionId, string PaymentUrl, string PixCopyPaste)> CreateSubscriptionAsync(string customerId, string plan, double value, DateTime? nextDueDate = null)
     {
         if (_accessToken == "mock-token")
         {
@@ -63,12 +63,14 @@ public class AsaasService : IAsaasService
         }
 
         var requestUrl = $"{_baseUrl}/subscriptions";
+        var dueDate = nextDueDate ?? DateTime.Today.AddDays(1);
+        
         var payload = new
         {
             customer = customerId,
             billingType = "UNDEFINED", // Permite cartão, Pix ou boleto
             value = value,
-            nextDueDate = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"), // Vence amanhã
+            nextDueDate = dueDate.ToString("yyyy-MM-dd"), // Vencimento configurável
             cycle = "MONTHLY",
             description = $"Assinatura MindSteps - Plano {plan}"
         };

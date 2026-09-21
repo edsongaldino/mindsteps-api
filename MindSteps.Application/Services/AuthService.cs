@@ -13,13 +13,16 @@ public class AuthService : IAuthService
 {
 	private readonly IUsuarioRepository _usuarioRepository;
 	private readonly IConfiguration _configuration;
+	private readonly IEmailService _emailService;
 
 	public AuthService(
 		IUsuarioRepository usuarioRepository,
-		IConfiguration configuration)
+		IConfiguration configuration,
+		IEmailService emailService)
 	{
 		_usuarioRepository = usuarioRepository;
 		_configuration = configuration;
+		_emailService = emailService;
 	}
 
 	public async Task<AuthResponseDto?> AutenticarAsync(LoginDto dto)
@@ -103,40 +106,73 @@ public class AuthService : IAuthService
 
 	public async Task<bool> RecuperarSenhaAsync(string email)
 	{
-		var usuario = await _usuarioRepository.ObterPorEmailAsync(email);
+		var usuario = await _usuarioRepository.ObterPorEmailAsync(email.ToLower().Trim());
 		if (usuario is null)
 		{
 			throw new System.Exception("Nenhum usuário cadastrado com este e-mail.");
 		}
 
-		var subject = "MindSteps - Recuperação de Senha";
-		var body = $@"Olá {usuario.Nome},
+		var codigoValidacao = new Random().Next(100000, 999999).ToString();
+		usuario.CodigoVerificacao = codigoValidacao;
+		usuario.CodigoVerificacaoExpiracao = DateTime.UtcNow.AddMinutes(30);
 
-Recebemos uma solicitação de recuperação de senha para sua conta MindSteps.
-Seu token de recuperação simulado é: {System.Guid.NewGuid().ToString().Substring(0, 8)}
+		await _usuarioRepository.SalvarAlteracoesAsync();
 
-Para redefinir sua senha, acesse o link de recuperação.
-Caso não tenha solicitado a alteração, desconsidere este e-mail.
+		var emailBody = MindSteps.Application.Utils.EmailTemplates.GetPasswordResetEmail(usuario.Nome, codigoValidacao);
 
-Atenciosamente,
-Equipe MindSteps";
+		await _emailService.SendEmailAsync(
+			usuario.Email,
+			"MindSteps - Recuperação de Senha",
+			emailBody
+		);
 
-		System.Console.WriteLine("==================================================");
-		System.Console.WriteLine($"[EMAIL ENVIADO] Para: {email}");
-		System.Console.WriteLine($"Assunto: {subject}");
-		System.Console.WriteLine("Corpo do e-mail:");
-		System.Console.WriteLine(body);
-		System.Console.WriteLine("==================================================");
+		return true;
+	}
 
-		try
+	public async Task<AuthResponseDto> RedefinirSenhaAsync(RedefinirSenhaDto dto)
+	{
+		var usuario = await _usuarioRepository.ObterPorEmailAsync(dto.Email.ToLower().Trim());
+		
+		if (usuario == null || usuario.CodigoVerificacao != dto.Codigo)
 		{
-			var logPath = @"C:\Projects\mindsteps-api\recovery_email_log.txt";
-			var logContent = $"Data/Hora: {System.DateTime.Now}\nPara: {email}\nAssunto: {subject}\n\n{body}\n\n==================================================\n\n";
-			await System.IO.File.AppendAllTextAsync(logPath, logContent);
+			throw new Exception("Código de verificação inválido.");
 		}
-		catch (System.Exception ex)
+		if (usuario.CodigoVerificacaoExpiracao < DateTime.UtcNow)
 		{
-			System.Console.WriteLine($"Erro ao gravar log de e-mail de recuperação: {ex.Message}");
+			throw new Exception("Código de verificação expirado.");
+		}
+
+		usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.NovaSenha);
+		usuario.CodigoVerificacao = null;
+		usuario.CodigoVerificacaoExpiracao = null;
+
+		await _usuarioRepository.SalvarAlteracoesAsync();
+
+		var token = GerarToken(usuario);
+
+		return new AuthResponseDto
+		{
+			Token = token,
+			UsuarioId = usuario.Id,
+			Nome = usuario.Nome,
+			Email = usuario.Email,
+			Perfil = usuario.Perfil.ToString(),
+			Aprovado = usuario.Perfil != MindSteps.Domain.Enums.PerfilUsuario.Psicologo || (usuario.Psicologo != null && usuario.Psicologo.Aprovado),
+			FotoUrl = usuario.Paciente?.FotoUrl ?? usuario.Psicologo?.FotoUrl
+		};
+	}
+
+	public async Task<bool> ValidarCodigoRecuperacaoAsync(string email, string codigo)
+	{
+		var usuario = await _usuarioRepository.ObterPorEmailAsync(email.ToLower().Trim());
+		
+		if (usuario == null || usuario.CodigoVerificacao != codigo)
+		{
+			throw new Exception("Código de verificação inválido.");
+		}
+		if (usuario.CodigoVerificacaoExpiracao < DateTime.UtcNow)
+		{
+			throw new Exception("Código de verificação expirado.");
 		}
 
 		return true;
