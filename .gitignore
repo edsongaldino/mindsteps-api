@@ -40,3 +40,7 @@ project.fragment.lock.json
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+# Firebase Credentials
+firebase-key.json
+firebase-key.json.json
